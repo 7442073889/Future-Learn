@@ -21,15 +21,6 @@
         .neon-text {
             text-shadow: 0 0 5px #4F46E5, 0 0 10px #4F46E5, 0 0 15px #4F46E5;
         }
-        
-        .neon-button {
-            transition: all 0.3s ease-in-out;
-        }
-
-        .neon-button:hover {
-            box-shadow: 0 0 10px #4F46E5, 0 0 20px #4F46E5;
-            transform: scale(1.05);
-        }
 
         /* Smooth Transition */
         .transition-all {
@@ -38,33 +29,40 @@
     </style>
 </head>
 <body class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white">
-    <!-- Top Navigation Bar -->
-    <nav class="glass flex justify-between items-center p-4 mx-4 my-4">
+    
+<!-- Top Navigation Bar -->
+<nav class="glass flex justify-between items-center p-4 mx-4 my-4">
         <h1 class="text-xl font-bold neon-text">🚀 Future Learn</h1>
-        <div>
-            <span class="text-gray-300 font-medium mr-4">Hello, {{ Auth::guard('admin')->check() ? Auth::guard('admin')->user()->name : 'Guest' }}
-</span>
-            <a href="{{ route('admin.logout') }}" class="bg-red-500 text-white px-4 py-2 rounded">Logout</a>
+        <div class="relative">
+           <!-- Profile Dropdown Button -->
+<button id="profile-btn" class="bg-gray-700 px-4 py-2 rounded text-white hover:bg-gray-600">
+    👤 ⏷
+</button>
+
+<!-- Profile Dropdown Menu -->
+<div id="profile-menu" class="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded shadow-lg hidden">
+    <a href="{{ route('admin.logout') }}" class="block px-4 py-2 text-red-400 hover:bg-red-600">Logout</a>
+</div>
+
         </div>
     </nav>
-    
+
     <div class="flex">
         <!-- Sidebar -->
-        <aside class="glass w-64 h-screen p-5 mx-4">
-            <ul class="space-y-4">
-                <li class="font-semibold text-gray-300 hover:text-purple-400 transition-all"><a href="#">📊 Dashboard</a></li>
+<aside class="glass w-64 h-screen p-5 mx-4">
+    <ul class="space-y-4">
+        <li class="font-semibold text-gray-300 hover:text-purple-400 transition-all">
+            <a href="{{ route('admin.dashboard') }}">📊 Dashboard</a>
+        </li>
 
-                <!-- My Courses Dropdown -->
-                <li class="font-semibold text-gray-300">
+        <!-- My Courses Dropdown -->
+        <li class="font-semibold text-gray-300">
                     <button class="w-full text-left flex justify-between items-center transition-all" onclick="toggleDropdown('coursesDropdown')">
                         📚 My Courses <span>&#9662;</span>
                     </button>
                     <ul id="coursesDropdown" class="hidden pl-4 space-y-2 mt-2">
-                    <li><a href="{{ route('course.html') }}" class="text-gray-400 hover:text-purple-400 transition-all">Enroll in HTML</a></li>
-
-                    <li><a href="{{ route('course.css') }}" class="text-gray-400 hover:text-purple-400 transition-all">Enroll in CSS</a></li>
-
-                       
+                        <li><a href="{{ route('admin.course.html') }}" class="text-gray-400 hover:text-purple-400 transition-all">Enroll in HTML</a></li>
+                        <li><a href="{{ route('admin.course.css') }}" class="text-gray-400 hover:text-purple-400 transition-all">Enroll in CSS</a></li>
                     </ul>
                 </li>
 
@@ -74,19 +72,27 @@
                         📝 Take Quiz <span>&#9662;</span>
                     </button>
                     <ul id="quizDropdown" class="hidden pl-4 space-y-2 mt-2">
-                    <li><a href="{{ route('quiz.html') }}" class="text-gray-400 hover:text-purple-400 transition-all">HTML Quiz</a></li>
-                    <li><a href="{{ route('quiz.css') }}" class="text-gray-400 hover:text-purple-400 transition-all">CSS Quiz</a></li>
-
-                        
+                        <li><a href="{{ route('admin.quiz.html') }}" class="text-gray-400 hover:text-purple-400 transition-all">HTML Quiz</a></li>
+                        <li><a href="{{ route('admin.quiz.css') }}" class="text-gray-400 hover:text-purple-400 transition-all">CSS Quiz</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ route('livechat') }}" class="text-gray-400 hover:text-purple-400 transition-all">💬 Live Chat</a></li>
-            </ul>
-        </aside>
+
+                <!-- Progress Section -->
+                <li class="font-semibold text-gray-300 hover:text-purple-400 transition-all">
+                    <a href="{{ route('admin.livepractice') }}">📈 LivePractice</a>
+                </li>
+
+
+        <!-- Live Chat -->
+        <li><a href="{{ route('admin.livechat') }}" class="text-gray-400 hover:text-purple-400 transition-all">💬 Admin Chat</a></li>
+    </ul>
+</aside>
+
         <!-- Main Content -->
         <main class="flex-1 p-8">
         <h2 class="text-3xl font-bold neon-text">
-    🚀 Welcome to Your Dashboard {{ Auth::guard('web')->user()->name }}</h2>
+    🚀 Welcome to Your Dashboard {{ Auth::guard('admin')->user()->name }}
+       </h2>
 
 
 
@@ -124,10 +130,41 @@
     </div>
     
     <script>
-        function toggleDropdown(id) {
-            document.getElementById(id).classList.toggle('hidden');
+    // Toggle Profile Dropdown
+    const profileBtn = document.getElementById('profile-btn');
+    const profileMenu = document.getElementById('profile-menu');
+
+    profileBtn.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevents the click from closing the menu immediately
+        profileMenu.classList.toggle('hidden');
+    });
+
+    // Close the Profile dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!profileMenu.contains(event.target) && !profileBtn.contains(event.target)) {
+            profileMenu.classList.add('hidden');
         }
-    </script>
+    });
+
+    // Toggle Function for Sidebar Dropdowns
+    function toggleDropdown(id) {
+        const dropdown = document.getElementById(id);
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Optional: Close all dropdowns when clicking outside (for better UX)
+    document.addEventListener('click', function(event) {
+        const dropdowns = ['coursesDropdown', 'quizDropdown'];
+        dropdowns.forEach(id => {
+            const dropdown = document.getElementById(id);
+            if (dropdown && !dropdown.contains(event.target) && !event.target.closest(`[onclick="toggleDropdown('${id}')"]`)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
+</script>
+
+
 </body>
 </html>
 

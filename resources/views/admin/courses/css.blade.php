@@ -37,7 +37,7 @@
     <!-- Navigation Bar -->
     <nav class="glass flex justify-between items-center p-4 mx-4 my-4">
         <h1 class="text-xl font-bold neon-text">🎨 Learn CSS</h1>
-        <a href="{{ route('account.dashboard') }}" class="bg-blue-500 neon-button text-white px-4 py-2 rounded">⬅ Back to Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}" class="bg-blue-500 neon-button text-white px-4 py-2 rounded">⬅ Back to Dashboard</a>
     </nav>
 
     <!-- Main Content -->

@@ -31,7 +31,7 @@ class LoginController extends Controller
                 return redirect()->route('account.welcome')->with('error', 'You are not authorized to access this page.');
             }
 
-         return redirect()->route('admindashboard');
+         return redirect()->route('admin.dashboard');
        }else{
         return redirect()->route('account.welcome')->with('error','Either email or password is incorrect.');
        }

@@ -11,49 +11,57 @@ class ChatController extends Controller
 {
     public function index()
     {
-        return view('livechat');
+        if (Auth::guard('web')->check() || Auth::guard('admin')->check()) {
+            return view('livechat');
+        }
+    
+        return redirect()->route('account.welcome')->with('error', 'You must be logged in to access the chat.');
     }
+    
 
-   public function getMessages()
-{
-    $messages = Message::with('user')->latest()->take(20)->get();
-
-    return response()->json([
-        'messages' => $messages
-    ]);
-}
-
+    public function getMessages()
+    {
+        if (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user(); // Normal User
+        } elseif (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user(); // Admin User
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        $messages = Message::with('user')->orderBy('created_at', 'asc')->get();
+    
+        \Log::info('Messages Retrieved for:', ['user_id' => $user->id, 'user_role' => $user->role ?? 'User/Admin']);
+    
+        return response()->json(['messages' => $messages]);
+    }
+    
     
 public function sendMessage(Request $request)
 {
-    \Log::info('Received Message:', $request->all()); // Log message data
-
-    $validated = $request->validate([
-        'message' => 'required|string|max:500',
-    ]);
-
-    // Check if admin or user is logged in
-    if (Auth::guard('admin')->check()) {
-        $user = Auth::guard('admin')->user();
-    } elseif (Auth::guard('web')->check()) {
-        $user = Auth::guard('web')->user();
+    // Check if a user or admin is authenticated
+    if (Auth::guard('web')->check()) {
+        $user = Auth::guard('web')->user(); // Normal User
+    } elseif (Auth::guard('admin')->check()) {
+        $user = Auth::guard('admin')->user(); // Admin User
     } else {
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
-    // Store the message with user details
+    \Log::info('Chat Message Sent By:', ['user_id' => $user->id, 'user_name' => $user->name]);
+
+    // Validate input
+    $validated = $request->validate([
+        'message' => 'required|string|max:500',
+    ]);
+
+    // Store the message in the database
     $message = Message::create([
-        'user_id' => $user->id,  // Works for both user and admin
+        'user_id' => $user->id,
         'message' => $validated['message'],
     ]);
 
-    \Log::info('Message saved:', $message->toArray()); // Log saved message
-
-    broadcast(new MessageSent($message->load('user')))->toOthers();
-
     return response()->json(['message' => $message]);
 }
-
-
 
 }
