@@ -76,6 +76,12 @@ Route::get('/admin/courses/html/notes', [AdminCourseController::class, 'htmlNote
 Route::get('/admin/courses/html/theory', [AdminCourseController::class, 'htmlTheory'])->name('admin.course.html.theory');
 
 Route::get('/courses/css', [CourseController::class, 'learnCss'])->name('course.css');
+// ✅ Route to Store Notes
+Route::post('/admin/courses/html/notes/store', [AdminCourseController::class, 'storeHtmlNote'])->name('admin.course.html.notes.store');
+
+// ✅ Route to Delete Notes
+Route::delete('/admin/courses/html/notes/delete', [AdminCourseController::class, 'deleteHtmlNote'])->name('admin.course.html.notes.delete');
+
 
 
 // Quiz Routes
