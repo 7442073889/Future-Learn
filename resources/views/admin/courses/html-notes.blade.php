@@ -8,7 +8,11 @@
 </head>
 <body class="bg-gray-900 text-white p-6">
 
-    <a href="{{ route('admin.course.html') }}" class="text-blue-400 hover:text-blue-600 text-lg">⬅ Back to HTML Course</a>
+<div class="flex justify-end mb-6">
+    <a href="{{ route('admin.course.html') }}" class="bg-gray-700 px-4 py-2 text-white rounded-lg hover:bg-gray-900 transition duration-300">
+        ⬅ Back to Dashboard
+    </a>
+</div>
 
     <h1 class="text-3xl font-bold mb-6 text-center">HTML Notes & Shortcuts</h1>
 
@@ -71,7 +75,8 @@
 
             try {
                 let response = await fetch("{{ route('admin.course.html.notes.delete') }}", {
-                    method: "DELETE",
+                method: "POST",
+
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}"

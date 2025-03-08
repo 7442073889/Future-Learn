@@ -76,11 +76,28 @@ Route::get('/admin/courses/html/notes', [AdminCourseController::class, 'htmlNote
 Route::get('/admin/courses/html/theory', [AdminCourseController::class, 'htmlTheory'])->name('admin.course.html.theory');
 
 Route::get('/courses/css', [CourseController::class, 'learnCss'])->name('course.css');
-// ✅ Route to Store Notes
-Route::post('/admin/courses/html/notes/store', [AdminCourseController::class, 'storeHtmlNote'])->name('admin.course.html.notes.store');
 
-// ✅ Route to Delete Notes
-Route::delete('/admin/courses/html/notes/delete', [AdminCourseController::class, 'deleteHtmlNote'])->name('admin.course.html.notes.delete');
+// ✅ Admin HTML Video Routes
+Route::post('/admin/courses/html/videos/store', [AdminCourseController::class, 'storeHtmlVideo'])
+    ->name('admin.course.html.video.store');
+
+Route::post('/admin/courses/html/videos/delete', [AdminCourseController::class, 'deleteHtmlVideo'])
+    ->name('admin.course.html.video.delete');
+
+
+
+// Notes Routes
+Route::post('/admin/courses/html/notes/store', [AdminCourseController::class, 'storeHtmlNote'])->name('admin.course.html.notes.store');
+Route::post('/admin/courses/html/notes/delete', [AdminCourseController::class, 'deleteHtmlNote'])->name('admin.course.html.notes.delete');
+
+// Theory Routes
+Route::post('/admin/courses/html/theory/store', [AdminCourseController::class, 'storeHtmlTheory'])
+    ->name('admin.course.html.theory.store');
+
+    Route::post('/admin/courses/html/theory/delete', [AdminCourseController::class, 'deleteHtmlTheory'])
+    ->name('admin.course.html.theory.delete');
+
+
 
 
 
@@ -94,6 +111,12 @@ Route::post('/quiz/css', [QuizController::class, 'submitCssQuiz'])->name('quiz.c
 Route::get('/livechat', [ChatController::class, 'index'])->name('livechat');
 Route::post('/send-message', [ChatController::class, 'sendMessage'])->name('send.message');
 Route::get('/get-messages', [ChatController::class, 'getMessages'])->name('get.messages');
+
+// User HTML Learning Pages
+Route::get('/courses/html', [CourseController::class, 'learnHtml'])->name('course.html');
+Route::get('/courses/html/videos', [CourseController::class, 'userHtmlVideos'])->name('course.html.videos');
+Route::get('/courses/html/notes', [CourseController::class, 'userHtmlNotes'])->name('course.html.notes');
+Route::get('/courses/html/theory', [CourseController::class, 'userHtmlTheory'])->name('course.html.theory');
 
  // ✅ Add LivePractice Route Here
  Route::get('/livepractice', [LivepracticeController::class, 'index'])->name('livepractice');

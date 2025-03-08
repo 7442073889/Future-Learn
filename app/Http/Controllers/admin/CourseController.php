@@ -1,54 +1,73 @@
 <?php
-
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CourseContent;
+use Illuminate\Support\Facades\Storage; // ✅ Correct Import
 
 class CourseController extends Controller
 {
-    // Main HTML Course Screen
+    // ✅ Main HTML Course Screen
     public function learnHtml()
     {
         return view('admin.courses.html');
     }
 
-    // Videos Section
+    // ✅ Retrieve Videos for Admin
     public function htmlVideos()
     {
-        $videos = [
-            ['title' => 'HTML Basics', 'video' => 'qz0aGYrrlhU'],
-            ['title' => 'HTML for Beginners', 'video' => 'BsDoLVMnmZs'],
-            ['title' => 'HTML Crash Course', 'video' => 'UB1O30fR-EE'],
-        ];
-
+        $videos = CourseContent::where('type', 'video')->get();
         return view('admin.courses.html-video', compact('videos'));
     }
 
-    // Notes Section (Retrieve Notes)
-    public function htmlNotes()
+    // ✅ Store New Video
+    public function storeHtmlVideo(Request $request)
     {
-        $notes = session()->get('notes', [
-            'HTML (HyperText Markup Language) is the standard for web pages.',
-            'HTML consists of elements like headings, paragraphs, and images.',
-            'Use `<h1>` to `<h6>` for headings, `<p>` for paragraphs.',
-            'Use `<a href="url">Link</a>` for hyperlinks.',
-            'Use `<img src="image.jpg" alt="description">` for images.',
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'video' => 'required|string|max:255' // Store YouTube Video ID
         ]);
 
+        CourseContent::create([
+            'type' => 'video',
+            'title' => $request->title,
+            'content' => $request->video
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    // ✅ Delete Video
+    public function deleteHtmlVideo(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:course_contents,id'
+        ]);
+
+        CourseContent::where('id', $request->id)->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    // ✅ Notes Section (Retrieve Notes)
+    public function htmlNotes()
+    {
+        $notes = CourseContent::where('type', 'note')->pluck('content')->toArray();
         return view('admin.courses.html-notes', compact('notes'));
     }
 
-    // ✅ Add New Note
+    // ✅ Store Note
     public function storeHtmlNote(Request $request)
     {
         $request->validate([
             'note' => 'required|string|max:255'
         ]);
 
-        $notes = session()->get('notes', []);
-        $notes[] = $request->note;
-        session()->put('notes', $notes);
+        CourseContent::create([
+            'type' => 'note',
+            'content' => $request->note
+        ]);
 
         return response()->json(['success' => true]);
     }
@@ -57,22 +76,60 @@ class CourseController extends Controller
     public function deleteHtmlNote(Request $request)
     {
         $request->validate([
-            'index' => 'required|integer'
+            'id' => 'required|integer|exists:course_contents,id'
         ]);
 
-        $notes = session()->get('notes', []);
-
-        if (isset($notes[$request->index])) {
-            array_splice($notes, $request->index, 1); // Remove note by index
-            session()->put('notes', $notes);
-        }
+        CourseContent::where('id', $request->id)->delete();
 
         return response()->json(['success' => true]);
     }
 
-    // Theory Section
+    // ✅ Theory Section (Retrieve Theory Points)
     public function htmlTheory()
     {
-        return view('admin.courses.html-theory');
+        $theory = CourseContent::where('type', 'theory')->get();
+        return view('admin.courses.html-theory', compact('theory'));
+    }
+
+    // ✅ Store Theory (With PDF Upload)
+    public function storeHtmlTheory(Request $request)
+    {
+        $request->validate([
+            'theory' => 'required|string|max:255',
+            'pdf' => 'nullable|mimes:pdf|max:2048',
+        ]);
+
+        // Handle PDF Upload
+        $pdfPath = null;
+        if ($request->hasFile('pdf')) {
+            $pdfPath = $request->file('pdf')->store('theory_pdfs', 'public'); // Save in storage/app/public/theory_pdfs
+        }
+
+        CourseContent::create([
+            'type' => 'theory',
+            'title' => $request->theory,
+            'content' => $pdfPath // Store PDF path
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    // ✅ Delete Theory (With PDF File Deletion)
+    public function deleteHtmlTheory(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:course_contents,id'
+        ]);
+
+        $theory = CourseContent::find($request->id);
+
+        // ✅ Check if the theory exists and has a PDF
+        if ($theory && !empty($theory->content)) {
+            Storage::delete('public/' . $theory->content); // ✅ Correct Storage usage
+        }
+
+        $theory->delete();
+
+        return response()->json(['success' => true]);
     }
 }

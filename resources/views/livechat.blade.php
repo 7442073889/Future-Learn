@@ -9,7 +9,16 @@
     <script src="/js/app.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
-    <div class="container mx-auto mt-10 p-6">
+    
+    <!-- Back to Dashboard Button -->
+    <div class="flex justify-end p-4">
+        <a href="{{ route('account.dashboard') }}" 
+           class="bg-gray-700 px-4 py-2 text-white rounded-lg hover:bg-gray-900 transition duration-300">
+            ⬅ Back to Dashboard
+        </a>
+    </div>
+
+    <div class="container mx-auto mt-6 p-6">
         <h1 class="text-2xl font-bold text-center">Live Chat</h1>
 
         <div id="chatBox" class="mt-5 bg-gray-800 p-4 rounded-lg h-80 overflow-y-scroll">
@@ -17,7 +26,8 @@
         </div>
 
         <form id="chatForm" class="mt-4">
-            <input type="text" id="messageInput" placeholder="Type a message..." class="w-full p-2 rounded-lg bg-gray-700 text-white">
+            <input type="text" id="messageInput" placeholder="Type a message..." 
+                   class="w-full p-2 rounded-lg bg-gray-700 text-white">
             <button type="submit" class="w-full mt-2 bg-purple-500 p-2 rounded-lg">Send</button>
         </form>
     </div>
@@ -51,32 +61,33 @@
     });
 
     function fetchMessages() {
-    fetch("{{ route('get.messages') }}")
-        .then(response => response.json())
-        .then(data => {
-            let messagesList = document.getElementById('messagesList');
-            messagesList.innerHTML = ''; // Clear previous messages
+        fetch("{{ route('get.messages') }}")
+            .then(response => response.json())
+            .then(data => {
+                let messagesList = document.getElementById('messagesList');
+                messagesList.innerHTML = ''; // Clear previous messages
 
-            if (data.messages.length === 0) {
-                messagesList.innerHTML = '<li class="p-2 text-gray-400">No messages yet...</li>';
-            } else {
-                data.messages.forEach(msg => {
-                    let username = msg.user ? msg.user.name : 'Unknown User';
-                    messagesList.innerHTML += `
-                        <li class="p-2">
-                            <strong>${username}:</strong> ${msg.message}
-                        </li>
-                    `;
-                });
-            }
-        })
-        .catch(error => console.error("Fetch Error:", error));
-}
+                if (data.messages.length === 0) {
+                    messagesList.innerHTML = '<li class="p-2 text-gray-400">No messages yet...</li>';
+                } else {
+                    data.messages.forEach(msg => {
+                        let username = msg.user ? msg.user.name : 'Unknown User';
+                        messagesList.innerHTML += `
+                            <li class="p-2">
+                                <strong>${username}:</strong> ${msg.message}
+                            </li>
+                        `;
+                    });
+                }
+            })
+            .catch(error => console.error("Fetch Error:", error));
+    }
 
-// Fetch messages every 3 seconds
-fetchMessages();
-setInterval(fetchMessages, 3000);
+    // Fetch messages every 3 seconds
+    fetchMessages();
+    setInterval(fetchMessages, 3000);
+    </script>
 
-</script>
 </body>
 </html>
+

@@ -9,7 +9,16 @@
     <script src="/js/app.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
-    <div class="container mx-auto mt-10 p-6">
+    
+    <!-- Back to Dashboard Button -->
+    <div class="flex justify-end p-4">
+        <a href="{{ route('admin.dashboard') }}" 
+           class="bg-gray-700 px-4 py-2 text-white rounded-lg hover:bg-gray-900 transition duration-300">
+            ⬅ Back to Dashboard
+        </a>
+    </div>
+
+    <div class="container mx-auto mt-6 p-6">
         <h1 class="text-2xl font-bold text-center">Admin Live Chat</h1>
 
         <div id="chatBox" class="mt-5 bg-gray-800 p-4 rounded-lg h-80 overflow-y-scroll">
@@ -81,5 +90,6 @@
     fetchMessages();
     setInterval(fetchMessages, 3000);
     </script>
+
 </body>
 </html>
